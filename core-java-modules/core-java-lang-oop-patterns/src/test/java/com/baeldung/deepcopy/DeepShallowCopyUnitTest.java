@@ -7,18 +7,18 @@ import org.junit.jupiter.api.Test;
 public class DeepShallowCopyUnitTest {
 
     @Test
-    public void whenFieldByFieldAssignmentOfStringFields_thenWeGetDeepCopy() {
+    public void givenObjectWithImmutableFieldsOnly_whenShallowCopy_thenWeGetIndependentCopy() {
         UKAddress address = new UKAddress("Downing St 10", "", "London", "England", "SE111AA");
         UKAddress copy = UKAddress.newInstance(address);
 
         assertThat(copy).isNotSameAs(address);
 
         copy.setPostCode("SE111AB");
-        assertThat(copy.getPostCode()).isNotEqualTo(address.getPostCode()); // doesn't change state of initial object, so deep copy
+        assertThat(copy.getPostCode()).isNotEqualTo(address.getPostCode());
     }
 
     @Test
-    public void whenFieldByFieldAssignmentWithNonPrimitive_thenWeGetShallowCopy() {
+    public void givenObjectWithNonPrimitiveField_whenShallowCopy_thenWeGetCopyWithSameReferences() {
         UKAddress address = new UKAddress("Downing St 10", "", "London", "England", "SE111AA");
         Student student = new Student("John Wick", 3, address);
         Student copy = new Student();
@@ -30,12 +30,12 @@ public class DeepShallowCopyUnitTest {
         copy.getAddress()
             .setPostCode("SE111AB");
 
-        assertThat(copy.getSemester()).isNotEqualTo(student.getSemester()); // state not changed for primitives
-        assertThat(copy.getAddress()).isEqualTo(student.getAddress()); // but state changed for assigned non-primitive
+        assertThat(copy.getSemester()).isNotEqualTo(student.getSemester());
+        assertThat(copy.getAddress()).isEqualTo(student.getAddress());
     }
 
     @Test
-    public void whenFieldByFieldDeepCopy_thenWeGetDeepCopy() {
+    public void givenObjectWithNonPrimitiveField_whenDeepCopy_thenWeGetIndependentCopy() {
         UKAddress address = new UKAddress("Downing St 10", "", "London", "England", "SE111AA");
         Student student = new Student("John Wick", 3, address);
         Student copy = Student.newInstance(student);
@@ -44,14 +44,14 @@ public class DeepShallowCopyUnitTest {
         copy.getAddress()
             .setPostCode("SE111AB");
 
-        assertThat(copy.getSemester()).isNotEqualTo(student.getSemester()); // state not changed for primitives
+        assertThat(copy.getSemester()).isNotEqualTo(student.getSemester());
         assertThat(copy.getAddress()
             .getPostCode()).isNotEqualTo(student.getAddress()
-            .getPostCode()); // state not changed for deep cloned non-primitive
+            .getPostCode());
     }
 
     @Test
-    public void givenArrayField_whenUsingArrayClone_thenWeGetShallowCopy() {
+    public void givenObjectWithArrayField_whenShallowCopyAndArrayCloneMethodUsed_thenWeGetCopyWithSameReferences() {
         UKAddress address = new UKAddress("Downing St 10", "", "London", "England", "SE111AA");
         Student student = new Student("John Wick", 3, address);
         Student[] activeParticipants = new Student[] { student };
@@ -67,11 +67,11 @@ public class DeepShallowCopyUnitTest {
 
         assertThat(copy.getActiveParticipants()[0].getAddress()
             .getPostCode()).isEqualTo(course.getActiveParticipants()[0].getAddress()
-            .getPostCode()); // changed the state of initial object
+            .getPostCode());
     }
 
     @Test
-    public void givenArrayField_whenUsingArrayDeepCopy_thenWeGetDeepCopy() {
+    public void givenObjectWithArrayField_whenDeepCopy_thenWeGetIndependentCopy() {
         UKAddress address = new UKAddress("Downing St 10", "", "London", "England", "SE111AA");
         Student student = new Student("John Wick", 3, address);
         Student[] activeParticipants = new Student[] { student };
@@ -83,6 +83,6 @@ public class DeepShallowCopyUnitTest {
 
         assertThat(copy.getActiveParticipants()[0].getAddress()
             .getPostCode()).isNotEqualTo(course.getActiveParticipants()[0].getAddress()
-            .getPostCode()); // doesn't change the state of initial object
+            .getPostCode());
     }
 }
